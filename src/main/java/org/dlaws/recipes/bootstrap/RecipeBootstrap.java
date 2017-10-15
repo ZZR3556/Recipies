@@ -1,5 +1,6 @@
 package org.dlaws.recipes.bootstrap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dlaws.recipes.domain.*;
 import org.dlaws.recipes.repositories.CategoryRepository;
 import org.dlaws.recipes.repositories.RecipeRepository;
@@ -7,10 +8,12 @@ import org.dlaws.recipes.repositories.UnitOfMeasureRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent>
 {
@@ -22,15 +25,20 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
                             CategoryRepository categoryRepository,
                             UnitOfMeasureRepository unitOfMeasureRepository )
     {
+        log.debug("In Constructor.");
+
         this.recipeRepository = recipeRepository;
         this.categoryRepository = categoryRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
     }
 
     @Override
+    @Transactional
     public void onApplicationEvent( ContextRefreshedEvent contextRefreshedEvent )
     {
         initCategories();
+        initUnitsOfMeasure();
+
         initRecipies();
     }
 
@@ -103,23 +111,18 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         return new Ingredient( description, new BigDecimal(amount), uom );
     }
 
-//    private void addCategory( Recipe recipe, String catName )
-//    {
-//        Category category = getCategory(catName);
-//        recipe.getCategories().add(category);
-//    }
-
     // Perfect Guacamole
     private void initPerfectGuacamole()
     {
-        System.out.println("In initPerfectGuacamole()");
+        log.debug("In initPerfectGuacamole()");
 
         Recipe recipe = new Recipe();
 
         recipe.setDescription("Perfect Guacamole");
 
-        recipe.addCategory(catMexican);
-        recipe.addCategory(catAmerican);
+        // TODO
+         recipe.addCategory(catMexican);
+         recipe.addCategory(catAmerican);
 
         recipe.setDifficulity(Difficulity.HARD);
 
@@ -185,12 +188,13 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     // Spicy Grilled Chicken Tacos
     private void initSpicyGrilledChickenTacos()
     {
-        System.out.println("In initSpicyGrilledChickenTacos()");
+        log.debug("In initSpicyGrilledChickenTacos()");
 
         Recipe recipe = new Recipe();
 
         recipe.setDescription("Spicy Grilled Chicken Tacos");
 
+        // TODO
         recipe.addCategory(catMexican);
         recipe.addCategory(catAmerican);
 

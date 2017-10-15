@@ -1,5 +1,7 @@
 package org.dlaws.recipes.domain;
 
+import lombok.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+@Data
+@EqualsAndHashCode( exclude = {"recipes"} )
 @Entity
 public class Category
 {
@@ -19,36 +23,5 @@ public class Category
     private String description;
 
     @ManyToMany( mappedBy = "categories" )
-    private Set<Recipe> recipies  = new HashSet<>();
-
-    public Long getId()
-    {
-        return id;
-    }
-
-    public void setId( Long id )
-    {
-        this.id = id;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription( String description )
-    {
-        this.description = description;
-    }
-
-    public Set<Recipe> getRecipies()
-    {
-        return recipies;
-    }
-
-    public void setRecipies( Set<Recipe> recipies )
-    {
-        this.recipies = recipies;
-    }
-
+    private Set<Recipe> recipes  = new HashSet<>();
 }
