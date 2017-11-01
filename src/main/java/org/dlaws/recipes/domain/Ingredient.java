@@ -1,7 +1,6 @@
 package org.dlaws.recipes.domain;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -15,6 +14,7 @@ import javax.persistence.OneToOne;
 
 @Data
 @EqualsAndHashCode( exclude = {"recipe"} )
+@ToString( exclude = {"recipe"} )
 @Entity
 public class Ingredient
 {

@@ -1,7 +1,7 @@
 package org.dlaws.recipes.domain;
 
 
-public enum Difficulity
+public enum Difficulty
 {
     EASY, MODERATE, KIND_OF_HARD, HARD
 }

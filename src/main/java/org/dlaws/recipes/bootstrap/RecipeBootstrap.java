@@ -120,17 +120,17 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         recipe.setDescription("Perfect Guacamole");
 
-        // TODO
          recipe.addCategory(catMexican);
          recipe.addCategory(catAmerican);
 
-        recipe.setDifficulity(Difficulity.HARD);
+        recipe.setDifficulty(Difficulty.HARD);
 
         recipe.setPrepTime(10);
         recipe.setCookTime(0);
 
         recipe.setServings(4);
-        recipe.setSource("http://www.simplyrecipes.com/recipes/perfect_guacamole/");
+        recipe.setSource("");
+        recipe.setUrl("http://www.simplyrecipes.com/recipes/perfect_guacamole/");
 
         // 2 ripe avocados
         // 1/2 teaspoon Kosher salt
@@ -194,17 +194,17 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         recipe.setDescription("Spicy Grilled Chicken Tacos");
 
-        // TODO
         recipe.addCategory(catMexican);
         recipe.addCategory(catAmerican);
 
-        recipe.setDifficulity(Difficulity.EASY);
+        recipe.setDifficulty(Difficulty.EASY);
 
         recipe.setPrepTime(20);
         recipe.setCookTime(15);
 
         recipe.setServings(6);
-        recipe.setSource("http://www.simplyrecipes.com/recipes/spicy_grilled_chicken_tacos/");
+        recipe.setSource("");
+        recipe.setUrl("http://www.simplyrecipes.com/recipes/spicy_grilled_chicken_tacos/");
 
         // 2 tablespoons ancho chili powder
         // 1 teaspoon dried oregano

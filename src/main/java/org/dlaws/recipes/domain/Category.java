@@ -13,6 +13,7 @@ import javax.persistence.ManyToMany;
 
 @Data
 @EqualsAndHashCode( exclude = {"recipes"} )
+@ToString( exclude = {"recipe"} )
 @Entity
 public class Category
 {
@@ -24,4 +25,12 @@ public class Category
 
     @ManyToMany( mappedBy = "categories" )
     private Set<Recipe> recipes  = new HashSet<>();
+
+    public void removeRecipe( Recipe recipe )
+    {
+        if ( recipes.remove( recipe ) )
+        {
+            recipe.removeCategory( this );
+        }
+    }
 }

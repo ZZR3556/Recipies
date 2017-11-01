@@ -2,8 +2,6 @@ package org.dlaws.recipes.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +40,7 @@ public class Recipe
     private String directions;
 
     @Enumerated( EnumType.STRING )
-    private Difficulity difficulity;
+    private Difficulty difficulty;
 
     @OneToMany( cascade = CascadeType.ALL, mappedBy = "recipe" )
     private Set<Ingredient> ingredients = new HashSet<>();
@@ -66,14 +64,44 @@ public class Recipe
         return this;
     }
 
+    public void removeIngredient( Ingredient ingredient )
+    {
+        ingredients.remove( ingredient );
+
+        ingredient.setRecipe( null );
+        // Difficulty.
+    }
+
     public void setNotes( Notes notes )
     {
         this.notes = notes;
-        notes.setRecipe(this);
+
+        if ( notes != null )
+        {
+            notes.setRecipe( this );
+        }
+    }
+
+    public  void removeNotes()
+    {
+        if ( notes != null )
+        {
+            notes.setRecipe( null );
+
+            notes = null;
+        }
     }
 
     public void addCategory( Category category )
     {
         this.categories.add(category);
+    }
+
+    public void removeCategory( Category category )
+    {
+        if ( categories.remove( category ) )
+        {
+            category.removeRecipe( this );
+        }
     }
 }

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -36,17 +37,6 @@ public class IndexControllerTest
     @Mock
     Model model;
 
-/*
-    public String getIndexPage( Model model )
-    {
-        log.debug("In getIndexPage().");
-
-        model.addAttribute("recipes", recipeService.getRecipes());
-
-        return "index";
-    }
- */
-
     @Before
     public void setUp() throws Exception
     {
@@ -56,17 +46,19 @@ public class IndexControllerTest
     }
 
     @Test
-    public void testMockMVC() throws Exception
+    public void testShowIndexPageMockMVC() throws Exception
     {
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(indexController).build();
 
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("index"));
+                .andExpect(view().name("index"))
+                .andExpect(model().size(1))
+                .andExpect(model().attributeExists("recipes"));
     }
 
     @Test
-    public void getIndexPage() throws Exception
+    public void testShowIndexPageBasic() throws Exception
     {
         // ***** Given *****
 
