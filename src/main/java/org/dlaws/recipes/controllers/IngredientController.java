@@ -1,17 +1,23 @@
 package org.dlaws.recipes.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.dlaws.recipes.commands.IngredientCommand;
 import org.dlaws.recipes.commands.RecipeCommand;
 import org.dlaws.recipes.commands.UnitOfMeasureCommand;
+import org.dlaws.recipes.exceptions.NotFoundException;
 import org.dlaws.recipes.services.IngredientService;
 import org.dlaws.recipes.services.RecipeService;
 import org.dlaws.recipes.services.UnitOfMeasureService;
+import org.dlaws.utils.Utils;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+
+import static org.dlaws.recipes.Statics.*;
 
 @Slf4j
 @Controller
@@ -37,14 +43,15 @@ public class IngredientController
     {
         log.debug("Preparing form to show Recipe Ingredient List. ( recipe id: " + recipeIdString + " )" );
 
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
 
         log.debug(">> Using RecipeService to get RecipeCommand object.");
 
         RecipeCommand recipeCommand = recipeService.getRecipeCommandById( recipeId );
 
         // Use command object to avoid lazy load errors in Thymeleaf rendering.
-        model.addAttribute("recipe", recipeCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_RECIPE, recipeCommand );
 
         return "/recipe/ingredient/list";
     }
@@ -55,14 +62,16 @@ public class IngredientController
         log.debug("Preparing form to show Recipe Ingredient details." +
                 " ( recipe id: " + recipeIdString + ", ingredientId: " + ingredientIdString + " )" );
 
-        Long recipeId = Long.valueOf( recipeIdString );
-        Long ingredientId = Long.valueOf( ingredientIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        // Long ingredientId = Long.valueOf( ingredientIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
+        Long ingredientId = Utils.parseLongInputValue( LABEL_INGREDIENT_ID, ingredientIdString );
 
         log.debug(">> Using IngredientService to get IngredientCommand object.");
 
         IngredientCommand ingredientCommand = ingredientService.findByRecipeIdAndIngredientId( recipeId, ingredientId );
 
-        model.addAttribute("ingredient", ingredientCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_INGREDIENT, ingredientCommand );
 
         return "/recipe/ingredient/show";
     }
@@ -75,8 +84,10 @@ public class IngredientController
         log.debug("Preparing form to update Recipe Ingredient." +
                 " ( recipeId: " + recipeIdString + ", ingredientId: " + ingredientIdString + " )" );
 
-        Long recipeId = Long.valueOf(recipeIdString);
-        Long ingredientId = Long.valueOf(ingredientIdString);
+        // Long recipeId = Long.valueOf(recipeIdString);
+        // Long ingredientId = Long.valueOf(ingredientIdString);
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
+        Long ingredientId = Utils.parseLongInputValue( LABEL_INGREDIENT_ID, ingredientIdString );
 
         log.debug(">> Using IngredientService to get IngredientCommand object.");
 
@@ -86,8 +97,8 @@ public class IngredientController
 
         Set<UnitOfMeasureCommand> unitOfMeasureCommandSet = unitOfMeasureService.listAllUoms();
 
-        model.addAttribute("ingredient", ingredientCommand );
-        model.addAttribute("uomList", unitOfMeasureCommandSet );
+        model.addAttribute( MODEL_ATTRIBUTE_INGREDIENT, ingredientCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_UOM_LIST, unitOfMeasureCommandSet );
 
         return "/recipe/ingredient/ingredientform";
     }
@@ -113,11 +124,13 @@ public class IngredientController
     {
         log.debug("Preparing form to create new Recipe Ingredient. ( recipeId: " + recipeIdString + " )" );
 
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
 
         if ( !recipeService.validateRecipeId( recipeId ) )
         {
-            throw new RuntimeException("Invalid Recipe ID: " + recipeId );
+            // throw new RuntimeException("Invalid Recipe ID: " + recipeId ); // TODO throw NotFoudException
+            throw new NotFoundException("Recipe ID Not Found ( " + recipeId + " )");
         }
 
         log.debug(">> Constructing new IngredientCommand object.");
@@ -131,8 +144,8 @@ public class IngredientController
 
         Set<UnitOfMeasureCommand> unitOfMeasureCommandSet = unitOfMeasureService.listAllUoms();
 
-        model.addAttribute( "ingredient", ingredientCommand );
-        model.addAttribute("uomList", unitOfMeasureCommandSet );
+        model.addAttribute( MODEL_ATTRIBUTE_INGREDIENT, ingredientCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_UOM_LIST, unitOfMeasureCommandSet );
 
         return "/recipe/ingredient/ingredientform";
     }
@@ -144,8 +157,10 @@ public class IngredientController
     {
         log.debug("Deleting Recipe Ingredient. ( recipeId: " + recipeIdString + ", ingredientId: " + ingredientIdString + " )" );
 
-        Long recipeId = Long.valueOf( recipeIdString );
-        Long ingredientId = Long.valueOf( ingredientIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        // Long ingredientId = Long.valueOf( ingredientIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
+        Long ingredientId = Utils.parseLongInputValue( LABEL_INGREDIENT_ID, ingredientIdString );
 
         log.debug(">> Using IngredientService to Delete Recipe Ingredient.");
 
@@ -158,7 +173,7 @@ public class IngredientController
 
         RecipeCommand recipeCommand = recipeService.getRecipeCommandById( recipeId );
 
-        model.addAttribute( "recipe", recipeCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_RECIPE, recipeCommand );
 
         return "redirect:/recipe/" + recipeIdString + "/ingredients";
     }

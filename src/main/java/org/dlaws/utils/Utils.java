@@ -1,5 +1,7 @@
 package org.dlaws.utils;
 
+import org.dlaws.recipes.exceptions.BadRequestException;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -62,4 +64,19 @@ public class Utils
         output.write(bytes,offset,length);
     }
 
+    public static Long parseLongInputValue( String label, String inputValue )
+    {
+        Long longValue;
+
+        try
+        {
+            longValue = Long.valueOf( inputValue );
+        }
+        catch ( NumberFormatException e )
+        {
+            throw new BadRequestException("Number Format Exception parsing " + label + " ( " + inputValue + " )", e );
+        }
+
+        return longValue;
+    }
 }

@@ -1,17 +1,28 @@
 package org.dlaws.recipes.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.dlaws.recipes.commands.RecipeCommand;
+import org.dlaws.recipes.exceptions.NotFoundException;
 import org.dlaws.recipes.services.RecipeService;
+import org.dlaws.utils.Utils;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
+
+import static org.dlaws.recipes.Statics.*;
 
 @Slf4j
 @Controller
 public class RecipeController
 {
-    private static final String MODEL_ATTRIBUTE = "recipe";
+    private static final String VIEW_RECIPE_RECIPEFORM = "/recipe/recipeform";
 
     private final RecipeService recipeService;
 
@@ -29,11 +40,12 @@ public class RecipeController
 
         log.debug(">> Using RecipeService to get RecipeCommand object.");
 
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
 
         RecipeCommand recipeCommand = recipeService.getRecipeCommandById( recipeId );
 
-        model.addAttribute( "recipe", recipeCommand ) ;
+        model.addAttribute( MODEL_ATTRIBUTE_RECIPE, recipeCommand ) ;
 
         return "/recipe/show";
     }
@@ -43,9 +55,9 @@ public class RecipeController
     {
         log.debug("Preparing form to create a new Recipe details.");
 
-        model.addAttribute( "recipe", new RecipeCommand());
+        model.addAttribute( MODEL_ATTRIBUTE_RECIPE, new RecipeCommand());
 
-        return "/recipe/recipeform";
+        return VIEW_RECIPE_RECIPEFORM;
     }
 
     @GetMapping("/recipe/{recipeIdString}/update")
@@ -55,21 +67,32 @@ public class RecipeController
 
         log.debug(">> Using RecipeService to get RecipeCommand object.");
 
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
 
         RecipeCommand recipeCommand = recipeService.getRecipeCommandById( recipeId );
 
-        model.addAttribute( "recipe", recipeCommand );
+        model.addAttribute( MODEL_ATTRIBUTE_RECIPE, recipeCommand );
 
-        return "/recipe/recipeform";
+        return VIEW_RECIPE_RECIPEFORM;
     }
 
     @PostMapping("/recipe")
-    public String saveOrUpdate( @ModelAttribute RecipeCommand command )
+    public String saveOrUpdate( @Valid @ModelAttribute("recipe") RecipeCommand command,
+                                BindingResult bindingResult )
     {
         log.debug("Storing New of Updated recipe." +
                         " ( recipeId: " + command.getId() +
                         ", description: " + command.getDescription() + " )");
+
+        if (bindingResult.hasErrors())
+        {
+            bindingResult.getAllErrors().forEach( objectError -> {
+                log.debug(objectError.toString());
+            });
+
+            return VIEW_RECIPE_RECIPEFORM;
+        }
 
         log.debug(">> Using RecipeService to store Recipe.");
 
@@ -85,7 +108,8 @@ public class RecipeController
 
         log.debug(">> Using RecipeService to delete Recipe.");
 
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue( LABEL_RECIPE_ID, recipeIdString );
 
         recipeService.deleteRecipeById( recipeId );
 

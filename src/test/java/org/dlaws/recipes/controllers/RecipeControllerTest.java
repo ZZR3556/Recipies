@@ -1,7 +1,7 @@
 package org.dlaws.recipes.controllers;
 
 import org.dlaws.recipes.commands.RecipeCommand;
-import org.dlaws.recipes.domain.Recipe;
+import org.dlaws.recipes.exceptions.NotFoundException;
 import org.dlaws.recipes.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +10,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.regex.Matcher;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mockito.Mockito.*;
@@ -24,9 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RecipeControllerTest
 {
     @Mock
-    RecipeService recipeService;
+    private RecipeService recipeService;
 
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Before
     public void setUp() throws Exception
@@ -35,13 +33,15 @@ public class RecipeControllerTest
 
         RecipeController recipeController = new RecipeController( recipeService );
 
-        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build();
     }
 
     @Test
     public void testGetRecipe() throws Exception
     {
-        Long testRecipeId = Long.valueOf(1);
+        Long testRecipeId = 1L;
 
         // Prepare RecipeCommand object to be returned by recipeService.getRecipeCommandById().
 
@@ -61,6 +61,30 @@ public class RecipeControllerTest
     }
 
     @Test
+    public void testGetRecipeNotFound() throws Exception
+    {
+        Long testRecipeId = 1L;
+
+        when(recipeService.getRecipeCommandById(anyLong())).thenThrow( NotFoundException.class );
+
+        // when / then
+        mockMvc.perform(get( "/recipe/" + testRecipeId + "/show" ))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("error"));
+    }
+
+    @Test
+    public void testGetRecipeNumberFormatException() throws Exception
+    {
+        String testRecipeId = "adsf";
+
+        // when / then
+        mockMvc.perform(get( "/recipe/" + testRecipeId + "/show" ))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"));
+    }
+
+    @Test
     public void testGetNewRecipeForm() throws Exception
     {
         mockMvc.perform(get( "/recipe/new" ))
@@ -74,7 +98,7 @@ public class RecipeControllerTest
     @Test
     public void testPostNewRecipeForm() throws Exception
     {
-        Long testRecipeId = Long.valueOf(2);
+        Long testRecipeId = 2L;
 
         // Prepare RecipeCommand object to be returned by recipeService.storeRecipe();
 
@@ -88,18 +112,41 @@ public class RecipeControllerTest
 
         mockMvc.perform( post("/recipe" )
                          .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                         .param("id", "" )
-                         .param( "description", "Secret Sauce" ) )
+                         .param( "id", "" )
+                         .param( "description", "Secret Sauce" )
+                         .param( "directions", "Directions" ) )
                 .andExpect( status().is3xxRedirection() )
-                .andExpect( view().name("redirect:/recipe/" + testRecipeId + "/show" ) );
+                .andExpect( view().name( "redirect:/recipe/" + testRecipeId + "/show" ) );
 
         verify( recipeService, times( 1 )).storeRecipe(any(RecipeCommand.class));
     }
 
     @Test
+    public void testPostValidationFailure() throws Exception
+    {
+        Long testRecipeId = 2L;
+
+        // Prepare RecipeCommand object to be returned by recipeService.storeRecipe();
+
+        RecipeCommand recipeCommand = new RecipeCommand();
+
+        recipeCommand.setId( testRecipeId );
+
+        when(recipeService.storeRecipe(any())).thenReturn( recipeCommand );
+
+        mockMvc.perform( post("/recipe")
+                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                         .param("id","")
+                         .param("cookTime", "9000") )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("recipe"))
+                .andExpect(view().name( "/recipe/recipeform" ));
+    }
+
+    @Test
     public void testGetUpdateView() throws Exception
     {
-        Long testRecipeId = Long.valueOf(2);
+        Long testRecipeId = 2L;
 
         // Prepare RecipeCommand object to be returned by recipeService.getRecipeCommandById().
 
@@ -124,7 +171,7 @@ public class RecipeControllerTest
     @Test
     public void testDeleteAction() throws Exception
     {
-        Long testRecipeId = Long.valueOf(1);
+        Long testRecipeId = 1L;
 
         // when / then
 

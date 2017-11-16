@@ -1,8 +1,10 @@
 package org.dlaws.recipes.services;
 
 import com.sun.org.apache.regexp.internal.RE;
+import org.dlaws.recipes.commands.RecipeCommand;
 import org.dlaws.recipes.converters.*;
 import org.dlaws.recipes.domain.Recipe;
+import org.dlaws.recipes.exceptions.NotFoundException;
 import org.dlaws.recipes.repositories.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +56,37 @@ public class RecipeServiceImplTest
 
         Recipe recipeReturned = recipeService.getRecipeById(testRecipeId);
 
-        assertNotNull( "recipeService.findById(targetId) returned null", recipeReturned );
+        assertNotNull( "recipeService.getRecipeById( recipeId ) returned null", recipeReturned );
+        verify( recipeRepository, times(1) ).findById(anyLong());
+        verify( recipeRepository, times(1) ).findById(testRecipeId);
+        verify( recipeRepository, never() ).findAll();
+    }
+
+    @Test( expected = NotFoundException.class )
+    public void getRecipeByIdNotFountTest() throws Exception
+    {
+        Long testRecipeId = Long.valueOf("1");
+
+        // Optional<Recipe> recipeOptional = Optional.empty();
+        when(recipeRepository.findById(anyLong())).thenReturn( Optional.empty() );
+
+        Recipe recipeReturned = recipeService.getRecipeById( testRecipeId );
+    }
+
+    @Test
+    public void getRecipeCommandByIdTest() throws Exception
+    {
+        Long testRecipeId = Long.valueOf("1");
+
+        Recipe recipe = new Recipe();
+        recipe.setId(testRecipeId);
+        Optional<Recipe> recipeOptional = Optional.of(recipe);
+
+        when( recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        RecipeCommand recipeCommandReturned = recipeService.getRecipeCommandById(testRecipeId);
+
+        assertNotNull( "recipeService.getRecipeCommandById( recipeId ) returned null", recipeCommandReturned );
         verify( recipeRepository, times(1) ).findById(anyLong());
         verify( recipeRepository, times(1) ).findById(testRecipeId);
         verify( recipeRepository, never() ).findAll();

@@ -5,6 +5,7 @@ import org.dlaws.recipes.commands.RecipeCommand;
 import org.dlaws.recipes.converters.RecipeCommandToRecipe;
 import org.dlaws.recipes.converters.RecipeToRecipeCommand;
 import org.dlaws.recipes.domain.Recipe;
+import org.dlaws.recipes.exceptions.NotFoundException;
 import org.dlaws.recipes.repositories.RecipeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +55,7 @@ public class RecipeServiceImpl implements RecipeService
 
         if ( !recipeOptional.isPresent() )
         {
-            throw new RuntimeException("Recipe Not Found ( recipeId = " + recipeId + " )");
+            throw new NotFoundException("Recipe ID Not Found ( " + recipeId + " )");
         }
 
         return recipeOptional.get();

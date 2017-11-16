@@ -104,7 +104,8 @@
                                 <h1 class="panel-title">Ingredients</h1>
                             </div>
                             <div class="col-md-1">
-                                <a class="btn btn-default" href="#" th:href="@{'/recipe/' + ${recipe.id} + '/ingredients'}" role="button">View</a>
+                                <a class="btn btn-default" href="#" role="button"
+                                   th:href="@{'/recipe/' + ${recipe.id} + '/ingredients'}">View</a>
                             </div>
                         </div>
                     </div>
@@ -112,7 +113,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <ul th:each="ingredient : ${recipe.getIngredients()}">
-                                    <!--/* @thymesVar id="ingredient" type="org.dlaws.recipes.domain.Ingredient" */-->
+                                    <!--/* @thymesVar id="ingredient" type="org.dlaws.recipes.commands.IngredientCommand" */-->
                                     <li th:remove="all">1 Cup of milk</li>
                                     <li th:remove="all">1 Teaspoon of chocolate</li>
                                     <li th:text="${ingredient.getFormattedString()}">1 Teaspoon of Sugar</li>

@@ -30,7 +30,8 @@ public class ImageController
     @GetMapping("/recipe/{recipeIdString}/image")
     public String showUploadForm( Model model, @PathVariable String recipeIdString )
     {
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue("Recipe ID", recipeIdString );
 
         model.addAttribute("recipe", recipeService.getRecipeCommandById( recipeId ));
 
@@ -41,7 +42,8 @@ public class ImageController
     public String handleImagePost( @PathVariable String recipeIdString,
                                    @RequestParam("imagefile") MultipartFile file  )
     {
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue("Recipe ID", recipeIdString );
 
         imageService.saveImageFile( recipeId, file );
 
@@ -51,7 +53,8 @@ public class ImageController
     @GetMapping("/recipe/{recipeIdString}/recipeimage")
     public void renderImageFromDB( @PathVariable String recipeIdString, HttpServletResponse response ) throws IOException
     {
-        Long recipeId = Long.valueOf( recipeIdString );
+        // Long recipeId = Long.valueOf( recipeIdString );
+        Long recipeId = Utils.parseLongInputValue("Recipe ID", recipeIdString );
 
         Recipe recipe = recipeService.getRecipeById( recipeId );
         Byte[] imageBoxedBytes = recipe.getImage();
